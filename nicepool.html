@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Status</title>
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+		  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+		  crossorigin="anonymous"></script>
+		  <style type="text/css">
+		  	.wrapper{
+		  		width: 100%;
+		  	}
+		  	.json-data{
+		  		width: 100%;
+		  		padding: 15px 0;
+		  	}
+		  	.json-data p{
+		  		margin: 0 auto;
+		  		text-align: center;
+		  	}
+		  	.error{
+		  		border: 2px solid red;
+		  		color: red;
+		  		border-radius: 5px;
+		  		font-size: 20px;
+		  		text-transform: uppercase;
+		  		font-weight: 700;
+		  		padding: 10px 0;
+		  		display: none;
+		  	}
+		  	.json-data .label{
+		  		font-size: 20px;
+		  		text-transform: uppercase;
+		  		padding: 20px 0;
+		  		font-weight: 700;
+		  	}
+		  	.json-data .data{
+		  		font-size: 15px;
+		  		text-transform: uppercase;
+		  		font-weight: 700;
+		  	} 
+		  	.json-data.status{
+		  		background-color: #446E9B;
+		  	}
+		  	.json-data.ubalance{
+		  		background-color: #E95420;
+		  	}
+		  	.json-data.balance{
+		  		background-color: #3FB009;
+		  	}
+		  	.json-data.hashrate{
+		  		background-color: #2FA4E7;
+		  	}
+		  	.json-data.hashrate-avg{
+		  		background-color: #FFAA00;
+		  	}
+		  </style>
+	</head>
+	<body>
+		<script type="text/javascript">
+			var balance = 0;
+			var unconfirmed_balance = 0;
+			var exchangeRate = 0;
+			$(document).ready(function(){
+				$.ajax({
+					url: 'https://api.nanopool.org/v1/zec/user/t1VKK736BVhtDeYFw7rTV4Vsn7SMNaJET2C',
+					success: function(data){
+						balance = parseFloat(data.data.balance);
+						unconfirmed_balance = parseFloat(data.data.unconfirmed_balance);
+						$('.status-text').text(data.status);
+						$('.ubalance-text').text(data.data.unconfirmed_balance);
+						$('.balance-text').text(data.data.balance);
+						$('.hashrate-text').text(data.data.hashrate + ' H/sec');
+						$('.hashrate-avg-text').text(data.data.avgHashrate.h6 + ' H/sec');
+					},
+					error: function(err){
+						$('.error').show();
+						$('.error-message').text(err);
+					}
+				});
+				$.ajax({
+					url: 'https://api.nanopool.org/v1/zec/prices',
+					success: function(data){
+						exchangeRate = data.data.price_usd;
+						$('.usd-ubalance-text').text((exchangeRate * unconfirmed_balance).toFixed(2) + ' $');
+						$('.usd-balance-text').text((exchangeRate * balance).toFixed(2) + ' $');
+					}				
+				});
+			});
+			setInterval(function(){
+				$.ajax({
+					url: 'https://api.nanopool.org/v1/zec/user/t1VKK736BVhtDeYFw7rTV4Vsn7SMNaJET2C',
+					success: function(data){
+						balance = parseFloat(data.data.balance);
+						unconfirmed_balance = parseFloat(data.data.unconfirmed_balance);
+						$('.status-text').text(data.status);
+						$('.ubalance-text').text(data.data.unconfirmed_balance);
+						$('.balance-text').text(data.data.balance);
+						$('.hashrate-text').text(data.data.hashrate + ' H/sec');
+						$('.hashrate-avg-text').text(data.data.avgHashrate.h6 + ' H/sec');
+					},
+					error: function(err){
+						$('.error').show();
+						$('.error-message').text(err);
+					}
+				});
+				$.ajax({
+					url: 'https://api.nanopool.org/v1/zec/prices',
+					success: function(data){
+						exchangeRate = data.data.price_usd;
+						$('.usd-ubalance-text').text((exchangeRate * unconfirmed_balance).toFixed(2) + ' $');
+						$('.usd-balance-text').text((exchangeRate * balance).toFixed(2) + ' $');
+					}				
+				});
+			}, 300000);
+		</script>
+		<div class="wrapper">
+			<div class="json-data error">
+				<p class="error-text">Error retrieving data!</p>
+				<p class="error-message"></p>
+			</div>
+			<div class="json-data status">
+				<p class="label">Status</p>
+				<p class="data status-text"></p>
+			</div>
+			<div class="json-data ubalance">
+				<p class="label">Pending balance</p>
+				<p class="data ubalance-text"></p>
+				<p class="usd-ubalance-text"></p>
+			</div>
+			<div class="json-data balance">
+				<p class="label">Balance</p>
+				<p class="data balance-text"></p>
+				<p class="usd-balance-text"></p>
+			</div>
+			<div class="json-data hashrate">
+				<p class="label">Hashrate</p>
+				<p class="data hashrate-text"></p>
+			</div>
+			<div class="json-data hashrate-avg">
+				<p class="label">Average hashrate</p>
+				<p class="data hashrate-avg-text"></p>
+			</div>
+		</div>
+	</body>
+</html>
